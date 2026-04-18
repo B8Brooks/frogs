@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Bucket {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  color     String   @default("#4a7c59")
+  createdAt DateTime @default(now())
+  frogs     Frog[]
+}
+
+model Frog {
+  id           String    @id @default(cuid())
+  title        String
+  description  String?
+  size         Int       @default(3)
+  isTodaysFrog Boolean   @default(false)
+  completed    Boolean   @default(false)
+  completedAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  bucketId String?
+  bucket   Bucket? @relation(fields: [bucketId], references: [id], onDelete: SetNull)
+
+  @@index([isTodaysFrog])
+  @@index([completed])
+  @@index([bucketId])
+}
