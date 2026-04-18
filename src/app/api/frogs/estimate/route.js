@@ -65,5 +65,6 @@ export async function POST(request) {
     size: result.size,
     reason: result.reason,
     bucket: matchedBucket,
+    cleanedTitle: result.cleanedTitle,
   });
 }

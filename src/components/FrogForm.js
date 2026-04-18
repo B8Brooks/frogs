@@ -12,6 +12,8 @@ export default function FrogForm({ buckets, onCreate, onCreateBucket, onBucketsC
   const [estimating, setEstimating] = useState(false);
   const [sizeOverridden, setSizeOverridden] = useState(false);
   const [bucketOverridden, setBucketOverridden] = useState(false);
+  const [titleOverridden, setTitleOverridden] = useState(false);
+  const [tidiedHint, setTidiedHint] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const [newBucketOpen, setNewBucketOpen] = useState(false);
@@ -19,10 +21,12 @@ export default function FrogForm({ buckets, onCreate, onCreateBucket, onBucketsC
 
   const debounceRef = useRef(null);
   const estimatedForRef = useRef("");
+  const tidiedHintTimerRef = useRef(null);
 
   useEffect(() => {
     if (!title.trim()) {
       setAiReason("");
+      setTidiedHint("");
       estimatedForRef.current = "";
       return;
     }
@@ -50,6 +54,19 @@ export default function FrogForm({ buckets, onCreate, onCreateBucket, onBucketsC
             setBucketId(data.bucket.id);
             if (onBucketsChanged) onBucketsChanged();
           }
+          if (
+            !titleOverridden &&
+            data.cleanedTitle &&
+            data.cleanedTitle.trim() &&
+            data.cleanedTitle.trim() !== title.trim()
+          ) {
+            setTitle(data.cleanedTitle);
+            // Prevent the input change from retriggering the debounce cycle
+            estimatedForRef.current = `${data.cleanedTitle.trim()}|${description.trim()}`;
+            setTidiedHint("✨ Tidied up");
+            if (tidiedHintTimerRef.current) clearTimeout(tidiedHintTimerRef.current);
+            tidiedHintTimerRef.current = setTimeout(() => setTidiedHint(""), 2500);
+          }
         }
       } catch {
         // ignore — size stays at current default
@@ -61,7 +78,7 @@ export default function FrogForm({ buckets, onCreate, onCreateBucket, onBucketsC
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [title, description, sizeOverridden, bucketOverridden, onBucketsChanged]);
+  }, [title, description, sizeOverridden, bucketOverridden, titleOverridden, onBucketsChanged]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -85,6 +102,8 @@ export default function FrogForm({ buckets, onCreate, onCreateBucket, onBucketsC
       setAiReason("");
       setSizeOverridden(false);
       setBucketOverridden(false);
+      setTitleOverridden(false);
+      setTidiedHint("");
       estimatedForRef.current = "";
     } catch {
       // Save failed — keep the user's input so they can retry
@@ -109,12 +128,20 @@ export default function FrogForm({ buckets, onCreate, onCreateBucket, onBucketsC
       <h3 className="frog-form-title">Toss a new frog into the pond 🐸</h3>
 
       <label className="frog-form-field">
-        <span>What's the frog?</span>
+        <span>
+          What's the frog?{" "}
+          {tidiedHint && <em className="frog-form-hint">{tidiedHint}</em>}
+        </span>
         <input
           type="text"
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="e.g., File taxes"
+          onChange={(e) => {
+            setTitle(e.target.value);
+            setTidiedHint("");
+            // If the user edits AFTER the AI replaced the title, respect their version
+            if (estimatedForRef.current) setTitleOverridden(true);
+          }}
+          placeholder="e.g., File taxes or 'I need to reply to Sarah's email'"
           required
         />
       </label>

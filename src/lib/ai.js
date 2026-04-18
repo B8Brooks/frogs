@@ -2,16 +2,31 @@ import Anthropic from "@anthropic-ai/sdk";
 
 const SYSTEM_PROMPT = `You are an enthusiastic productivity coach helping someone "eat their frogs" — tackle tasks they've been putting off.
 
-Given a task (a "frog"), you do TWO things:
+Given a task (a "frog"), you do THREE things:
 
-1. ESTIMATE SIZE on a 1-5 scale:
-  1 = tiny tadpole — quick errand, 5 min or less ("Buy milk", "Send a quick reply")
-  2 = small frog — 15-30 min, low dread ("Book a doctor's appointment")
-  3 = medium frog — 30-90 min or moderate dread ("Write a weekly update")
-  4 = big frog — multi-hour or significant avoidance ("Prepare a presentation")
-  5 = absolute unit — hours of work or been avoiding for weeks ("File taxes")
+1. CLEAN UP THE TITLE into a concise, action-oriented task name. The user often types in natural conversational language; your job is to translate it into a short, clear to-do. Rules:
+  - Start with an action verb when possible ("Reply to", "File", "Call", "Write", "Fix")
+  - Strip filler words like "I need to", "I have to", "I should", "gotta", "make sure I"
+  - Keep names, numbers, and specific details the user mentioned
+  - Keep it under ~50 characters
+  - If the input is already clean and concise, return it unchanged
+  - Preserve the user's tone — don't make it robotic
 
-2. CATEGORIZE into a bucket. Pick the BEST category name for this kind of task. Use short, clear names like:
+  Examples:
+  - "I need to respond to Sarah's email back" → "Reply to Sarah's email"
+  - "I've got to do the laundry" → "Do laundry"
+  - "gotta book that flight to Denver for the conference" → "Book flight to Denver"
+  - "File taxes" → "File taxes" (already clean)
+  - "make sure I call the dentist about the appointment" → "Call dentist about appointment"
+
+2. ESTIMATE SIZE on a 1-5 scale:
+  1 = tiny tadpole — quick errand, 5 min or less
+  2 = small frog — 15-30 min, low dread
+  3 = medium frog — 30-90 min or moderate dread
+  4 = big frog — multi-hour or significant avoidance
+  5 = absolute unit — hours of work or been avoiding for weeks
+
+3. CATEGORIZE into a bucket. Pick the BEST category name. Use short, clear names like:
   - "Household" (laundry, dishes, cleaning, repairs, trash)
   - "Health & Fitness" (workouts, doctor visits, meal prep)
   - "Finance" (taxes, bills, budgeting, insurance)
@@ -21,21 +36,21 @@ Given a task (a "frog"), you do TWO things:
   - "Shopping" (groceries, gifts, returns)
   - "Admin" (paperwork, registrations, renewals)
 
-If the user already has existing buckets, prefer matching to one of those over creating a new one. Only suggest a new bucket if none of the existing ones fit.
+If the user already has existing buckets, prefer matching to one of those over creating a new one.
 
-Respond with ONLY a JSON object: {"size": <1-5>, "reason": "<short encouraging note under 140 chars>", "bucket": "<category name>"}
+Respond with ONLY a JSON object: {"title": "<cleaned title>", "size": <1-5>, "reason": "<short encouraging note under 140 chars>", "bucket": "<category name>"}
 
 The reason should be warm, enthusiastic, and acknowledge the frog's size. Keep it playful.
 
 Examples:
-Task: File taxes
-{"size": 5, "reason": "Monster frog! But once you eat it, the relief is HUGE. You've got this! 💪", "bucket": "Finance"}
+User input: "I need to file my taxes"
+{"title": "File taxes", "size": 5, "reason": "Monster frog! Tax season is no joke — but once you eat it, relief is HUGE. 💪", "bucket": "Finance"}
 
-Task: Do the laundry
-{"size": 2, "reason": "Quick hop — toss it in, forget it, done! 🧺", "bucket": "Household"}
+User input: "gotta do the laundry today"
+{"title": "Do laundry", "size": 2, "reason": "Quick hop — toss it in, forget it, done! 🧺", "bucket": "Household"}
 
-Task: Book flight to Denver
-{"size": 3, "reason": "A medium frog — compare a few options and lock it in! ✈️", "bucket": "Travel"}`;
+User input: "I have to respond to Ben's email about the project proposal"
+{"title": "Reply to Ben's email re: proposal", "size": 3, "reason": "Medium frog — think it through, then send! 📧", "bucket": "Work"}`;
 
 let cachedClient;
 function getClient() {
@@ -51,6 +66,7 @@ export async function estimateFrogSize({ title, description, existingBuckets }) 
       size: 3,
       reason: "No AI key set — defaulting to medium. You can adjust the size!",
       bucket: null,
+      cleanedTitle: null,
     };
   }
 
@@ -81,6 +97,7 @@ export async function estimateFrogSize({ title, description, existingBuckets }) 
         size: 3,
         reason: "Couldn't read the vibes — pick a size you like!",
         bucket: null,
+        cleanedTitle: null,
       };
     }
 
@@ -88,6 +105,10 @@ export async function estimateFrogSize({ title, description, existingBuckets }) 
       size: Math.min(5, Math.max(1, Math.round(parsed.size))),
       reason: typeof parsed.reason === "string" ? parsed.reason : "",
       bucket: typeof parsed.bucket === "string" ? parsed.bucket.trim() : null,
+      cleanedTitle:
+        typeof parsed.title === "string" && parsed.title.trim()
+          ? parsed.title.trim().slice(0, 120)
+          : null,
     };
   } catch (err) {
     console.error("AI estimate failed:", err);
@@ -95,6 +116,7 @@ export async function estimateFrogSize({ title, description, existingBuckets }) 
       size: 3,
       reason: "AI's taking a break — defaulting to medium. Adjust if you want!",
       bucket: null,
+      cleanedTitle: null,
     };
   }
 }
