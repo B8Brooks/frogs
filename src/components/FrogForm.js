@@ -76,6 +76,7 @@ export default function FrogForm({ buckets, onCreate, onCreateBucket, onBucketsC
         bucketId: bucketId || null,
         recurrence: recurrence || null,
       });
+      // Only clear the form if onCreate resolved (save succeeded)
       setTitle("");
       setDescription("");
       setSize(3);
@@ -85,6 +86,8 @@ export default function FrogForm({ buckets, onCreate, onCreateBucket, onBucketsC
       setSizeOverridden(false);
       setBucketOverridden(false);
       estimatedForRef.current = "";
+    } catch {
+      // Save failed — keep the user's input so they can retry
     } finally {
       setSubmitting(false);
     }

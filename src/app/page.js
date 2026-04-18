@@ -21,13 +21,23 @@ export default function Dashboard() {
   const [buckets, setBuckets] = useState([]);
   const [selectedBucketId, setSelectedBucketId] = useState("all");
   const [loading, setLoading] = useState(true);
-  const [toast, setToast] = useState("");
+  const [toast, setToast] = useState({ message: "", kind: "info" });
   const [refreshing, setRefreshing] = useState(false);
 
-  const showToast = useCallback((message) => {
-    setToast(message);
-    setTimeout(() => setToast(""), 2500);
+  const showToast = useCallback((message, kind = "info") => {
+    setToast({ message, kind });
+    setTimeout(() => setToast({ message: "", kind: "info" }), 3500);
   }, []);
+
+  async function parseError(res) {
+    try {
+      const data = await res.json();
+      if (data && data.error) return data.error;
+    } catch {
+      // ignore
+    }
+    return `Server error (${res.status})`;
+  }
 
   const loadAll = useCallback(async () => {
     const [frogsRes, bucketsRes] = await Promise.all([
@@ -58,46 +68,68 @@ export default function Dashboard() {
   }, [loadAll]);
 
   async function handleCreateFrog(frogData) {
-    const res = await fetch("/api/frogs", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(frogData),
-    });
-    if (res.ok) {
+    try {
+      const res = await fetch("/api/frogs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(frogData),
+      });
+      if (!res.ok) {
+        const msg = await parseError(res);
+        showToast(`Couldn't save frog: ${msg}`, "error");
+        throw new Error(msg);
+      }
       const { frog } = await res.json();
       setFrogs((prev) => [frog, ...prev]);
       showToast("Into the pond it goes! 💪");
+    } catch (err) {
+      if (!err.message?.startsWith("Server error") && !err.message?.includes(":")) {
+        showToast("Network error — check your connection and try again.", "error");
+      }
+      throw err;
     }
   }
 
   async function handleCreateBucket(name) {
-    const res = await fetch("/api/buckets", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name }),
-    });
-    if (res.ok) {
-      const { bucket } = await res.json();
-      setBuckets((prev) => [...prev, bucket]);
-      showToast(`Bucket "${bucket.name}" created!`);
-      return bucket;
+    try {
+      const res = await fetch("/api/buckets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      });
+      if (res.ok) {
+        const { bucket } = await res.json();
+        setBuckets((prev) => [...prev, bucket]);
+        showToast(`Bucket "${bucket.name}" created!`);
+        return bucket;
+      }
+      if (res.status === 409) {
+        showToast("A bucket with that name already exists", "error");
+      } else {
+        const msg = await parseError(res);
+        showToast(`Couldn't create bucket: ${msg}`, "error");
+      }
+      return null;
+    } catch {
+      showToast("Network error — check your connection and try again.", "error");
+      return null;
     }
-    if (res.status === 409) {
-      showToast("A bucket with that name already exists");
-    }
-    return null;
   }
 
   async function patchFrog(frog, patch) {
-    const res = await fetch(`/api/frogs/${frog.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(patch),
-    });
-    if (res.ok) {
+    try {
+      const res = await fetch(`/api/frogs/${frog.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(patch),
+      });
+      if (!res.ok) {
+        const msg = await parseError(res);
+        showToast(`Couldn't update frog: ${msg}`, "error");
+        return null;
+      }
       const { frog: updated } = await res.json();
       setFrogs((prev) => {
-        // If we just set today's frog, unset others locally too
         if (patch.isTodaysFrog === true) {
           return prev.map((f) =>
             f.id === updated.id ? updated : { ...f, isTodaysFrog: false },
@@ -106,24 +138,28 @@ export default function Dashboard() {
         return prev.map((f) => (f.id === updated.id ? updated : f));
       });
       return updated;
+    } catch {
+      showToast("Network error — check your connection and try again.", "error");
+      return null;
     }
-    return null;
   }
 
   async function handleSetToday(frog) {
-    await patchFrog(frog, { isTodaysFrog: true });
-    showToast("Brave choice! This frog doesn't stand a chance. 🐸");
+    const updated = await patchFrog(frog, { isTodaysFrog: true });
+    if (updated) showToast("Brave choice! This frog doesn't stand a chance. 🐸");
   }
 
   async function handleEat(frog) {
-    await patchFrog(frog, { completed: true });
-    const msg = CELEBRATIONS[Math.floor(Math.random() * CELEBRATIONS.length)];
-    showToast(msg);
+    const updated = await patchFrog(frog, { completed: true });
+    if (updated) {
+      const msg = CELEBRATIONS[Math.floor(Math.random() * CELEBRATIONS.length)];
+      showToast(msg);
+    }
   }
 
   async function handleUneat(frog) {
-    await patchFrog(frog, { completed: false });
-    showToast("Back in the pond it goes!");
+    const updated = await patchFrog(frog, { completed: false });
+    if (updated) showToast("Back in the pond it goes!");
   }
 
   async function handleRefreshRecurring() {
@@ -131,17 +167,22 @@ export default function Dashboard() {
     setRefreshing(true);
     try {
       const res = await fetch("/api/frogs/refresh-recurring", { method: "POST" });
-      if (res.ok) {
-        const data = await res.json();
-        setFrogs(data.frogs);
-        if (data.refreshedCount > 0) {
-          showToast(
-            `${data.refreshedCount} frog${data.refreshedCount === 1 ? "" : "s"} hopped back into the pond! 🐸`,
-          );
-        } else {
-          showToast("No recurring frogs to refresh right now.");
-        }
+      if (!res.ok) {
+        const msg = await parseError(res);
+        showToast(`Couldn't refresh: ${msg}`, "error");
+        return;
       }
+      const data = await res.json();
+      setFrogs(data.frogs);
+      if (data.refreshedCount > 0) {
+        showToast(
+          `${data.refreshedCount} frog${data.refreshedCount === 1 ? "" : "s"} hopped back into the pond! 🐸`,
+        );
+      } else {
+        showToast("No recurring frogs to refresh right now.");
+      }
+    } catch {
+      showToast("Network error — check your connection and try again.", "error");
     } finally {
       setRefreshing(false);
     }
@@ -149,10 +190,17 @@ export default function Dashboard() {
 
   async function handleDelete(frog) {
     if (!confirm(`Remove "${frog.title}" from the pond?`)) return;
-    const res = await fetch(`/api/frogs/${frog.id}`, { method: "DELETE" });
-    if (res.ok) {
+    try {
+      const res = await fetch(`/api/frogs/${frog.id}`, { method: "DELETE" });
+      if (!res.ok) {
+        const msg = await parseError(res);
+        showToast(`Couldn't delete: ${msg}`, "error");
+        return;
+      }
       setFrogs((prev) => prev.filter((f) => f.id !== frog.id));
       showToast("Frog removed.");
+    } catch {
+      showToast("Network error — check your connection and try again.", "error");
     }
   }
 
@@ -208,7 +256,7 @@ export default function Dashboard() {
           />
         )}
       </main>
-      <Toast message={toast} />
+      <Toast message={toast.message} kind={toast.kind} />
     </>
   );
 }
