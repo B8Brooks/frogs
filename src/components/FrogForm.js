@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-export default function FrogForm({ buckets, onCreate, onCreateBucket }) {
+export default function FrogForm({ buckets, onCreate, onCreateBucket, onBucketsChanged }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [size, setSize] = useState(3);
@@ -11,6 +11,7 @@ export default function FrogForm({ buckets, onCreate, onCreateBucket }) {
   const [aiReason, setAiReason] = useState("");
   const [estimating, setEstimating] = useState(false);
   const [sizeOverridden, setSizeOverridden] = useState(false);
+  const [bucketOverridden, setBucketOverridden] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const [newBucketOpen, setNewBucketOpen] = useState(false);
@@ -25,7 +26,6 @@ export default function FrogForm({ buckets, onCreate, onCreateBucket }) {
       estimatedForRef.current = "";
       return;
     }
-    if (sizeOverridden) return;
 
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(async () => {
@@ -44,7 +44,11 @@ export default function FrogForm({ buckets, onCreate, onCreateBucket }) {
           const data = await res.json();
           if (!sizeOverridden) {
             setSize(data.size);
-            setAiReason(data.reason || "");
+          }
+          setAiReason(data.reason || "");
+          if (!bucketOverridden && data.bucket) {
+            setBucketId(data.bucket.id);
+            if (onBucketsChanged) onBucketsChanged();
           }
         }
       } catch {
@@ -57,7 +61,7 @@ export default function FrogForm({ buckets, onCreate, onCreateBucket }) {
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [title, description, sizeOverridden]);
+  }, [title, description, sizeOverridden, bucketOverridden, onBucketsChanged]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -79,6 +83,7 @@ export default function FrogForm({ buckets, onCreate, onCreateBucket }) {
       setRecurrence("");
       setAiReason("");
       setSizeOverridden(false);
+      setBucketOverridden(false);
       estimatedForRef.current = "";
     } finally {
       setSubmitting(false);
@@ -147,11 +152,16 @@ export default function FrogForm({ buckets, onCreate, onCreateBucket }) {
       </div>
 
       <div className="frog-form-field">
-        <span>Bucket (optional)</span>
+        <span>
+          Bucket {estimating && <em className="frog-form-hint">(auto-picking...)</em>}
+        </span>
         <div className="bucket-select-row">
           <select
             value={bucketId}
-            onChange={(e) => setBucketId(e.target.value)}
+            onChange={(e) => {
+              setBucketId(e.target.value);
+              setBucketOverridden(true);
+            }}
           >
             <option value="">— No bucket —</option>
             {buckets.map((b) => (

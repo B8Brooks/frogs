@@ -2,27 +2,40 @@ import Anthropic from "@anthropic-ai/sdk";
 
 const SYSTEM_PROMPT = `You are an enthusiastic productivity coach helping someone "eat their frogs" — tackle tasks they've been putting off.
 
-Given a task (a "frog"), estimate how big of a frog it is on a 1-5 scale:
+Given a task (a "frog"), you do TWO things:
 
-  1 = tiny tadpole — quick errand, 5 minutes or less, almost no friction ("Buy milk", "Send a quick reply")
-  2 = small frog — 15-30 minutes, low dread ("Book a doctor's appointment", "Reply to a friend's email")
-  3 = medium frog — 30-90 minutes or moderate dread ("Write a weekly update", "Call the insurance company")
-  4 = big frog — multi-hour task or significant avoidance ("Prepare a presentation", "Have a tough conversation")
-  5 = absolute unit — hours of work or been avoiding for weeks ("File taxes", "Write the annual review")
+1. ESTIMATE SIZE on a 1-5 scale:
+  1 = tiny tadpole — quick errand, 5 min or less ("Buy milk", "Send a quick reply")
+  2 = small frog — 15-30 min, low dread ("Book a doctor's appointment")
+  3 = medium frog — 30-90 min or moderate dread ("Write a weekly update")
+  4 = big frog — multi-hour or significant avoidance ("Prepare a presentation")
+  5 = absolute unit — hours of work or been avoiding for weeks ("File taxes")
 
-Respond with ONLY a JSON object in this exact shape: {"size": <1-5>, "reason": "<short encouraging note>"}
+2. CATEGORIZE into a bucket. Pick the BEST category name for this kind of task. Use short, clear names like:
+  - "Household" (laundry, dishes, cleaning, repairs, trash)
+  - "Health & Fitness" (workouts, doctor visits, meal prep)
+  - "Finance" (taxes, bills, budgeting, insurance)
+  - "Work" (reports, meetings, presentations, emails to colleagues)
+  - "Travel" (booking flights, reservations, packing)
+  - "Personal" (haircut, phone calls to friends/family)
+  - "Shopping" (groceries, gifts, returns)
+  - "Admin" (paperwork, registrations, renewals)
 
-The reason should be 1-2 short sentences, warm and enthusiastic, that acknowledges the size and cheers the person on. The occasional frog reference is welcome. Keep it under 140 characters.
+If the user already has existing buckets, prefer matching to one of those over creating a new one. Only suggest a new bucket if none of the existing ones fit.
+
+Respond with ONLY a JSON object: {"size": <1-5>, "reason": "<short encouraging note under 140 chars>", "bucket": "<category name>"}
+
+The reason should be warm, enthusiastic, and acknowledge the frog's size. Keep it playful.
 
 Examples:
 Task: File taxes
-{"size": 5, "reason": "That's a monster frog! Tax season is no joke — but once you eat it, the relief is HUGE. You've got this! 💪"}
+{"size": 5, "reason": "Monster frog! But once you eat it, the relief is HUGE. You've got this! 💪", "bucket": "Finance"}
 
-Task: Buy groceries
-{"size": 2, "reason": "Just a small hop! Quick trip, cross it off, feel great. 🛒"}
+Task: Do the laundry
+{"size": 2, "reason": "Quick hop — toss it in, forget it, done! 🧺", "bucket": "Household"}
 
-Task: Write quarterly report
-{"size": 4, "reason": "A big ol' frog, but you've written these before — you know the moves. Get it done! 🐸"}`;
+Task: Book flight to Denver
+{"size": 3, "reason": "A medium frog — compare a few options and lock it in! ✈️", "bucket": "Travel"}`;
 
 let cachedClient;
 function getClient() {
@@ -32,17 +45,22 @@ function getClient() {
   return cachedClient;
 }
 
-export async function estimateFrogSize({ title, description }) {
+export async function estimateFrogSize({ title, description, existingBuckets }) {
   if (!process.env.ANTHROPIC_API_KEY) {
     return {
       size: 3,
       reason: "No AI key set — defaulting to medium. You can adjust the size!",
+      bucket: null,
     };
   }
 
-  const userContent = description
+  let userContent = description
     ? `Task: ${title}\n\nNotes: ${description}`
     : `Task: ${title}`;
+
+  if (existingBuckets && existingBuckets.length > 0) {
+    userContent += `\n\nExisting buckets the user already has: ${existingBuckets.join(", ")}`;
+  }
 
   try {
     const response = await getClient().messages.create({
@@ -62,18 +80,21 @@ export async function estimateFrogSize({ title, description }) {
       return {
         size: 3,
         reason: "Couldn't read the vibes — pick a size you like!",
+        bucket: null,
       };
     }
 
     return {
       size: Math.min(5, Math.max(1, Math.round(parsed.size))),
       reason: typeof parsed.reason === "string" ? parsed.reason : "",
+      bucket: typeof parsed.bucket === "string" ? parsed.bucket.trim() : null,
     };
   } catch (err) {
     console.error("AI estimate failed:", err);
     return {
       size: 3,
       reason: "AI's taking a break — defaulting to medium. Adjust if you want!",
+      bucket: null,
     };
   }
 }

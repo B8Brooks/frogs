@@ -45,6 +45,14 @@ export default function Dashboard() {
     setLoading(false);
   }, []);
 
+  const refreshBuckets = useCallback(async () => {
+    const res = await fetch("/api/buckets");
+    if (res.ok) {
+      const data = await res.json();
+      setBuckets(data.buckets);
+    }
+  }, []);
+
   useEffect(() => {
     loadAll();
   }, [loadAll]);
@@ -165,6 +173,7 @@ export default function Dashboard() {
           buckets={buckets}
           onCreate={handleCreateFrog}
           onCreateBucket={handleCreateBucket}
+          onBucketsChanged={refreshBuckets}
         />
 
         {buckets.length > 0 && (
