@@ -7,6 +7,7 @@ export default function FrogForm({ buckets, onCreate, onCreateBucket }) {
   const [description, setDescription] = useState("");
   const [size, setSize] = useState(3);
   const [bucketId, setBucketId] = useState("");
+  const [recurrence, setRecurrence] = useState("");
   const [aiReason, setAiReason] = useState("");
   const [estimating, setEstimating] = useState(false);
   const [sizeOverridden, setSizeOverridden] = useState(false);
@@ -69,11 +70,13 @@ export default function FrogForm({ buckets, onCreate, onCreateBucket }) {
         description: description.trim() || null,
         size,
         bucketId: bucketId || null,
+        recurrence: recurrence || null,
       });
       setTitle("");
       setDescription("");
       setSize(3);
       setBucketId("");
+      setRecurrence("");
       setAiReason("");
       setSizeOverridden(false);
       estimatedForRef.current = "";
@@ -183,6 +186,19 @@ export default function FrogForm({ buckets, onCreate, onCreateBucket }) {
           </div>
         )}
       </div>
+
+      <label className="frog-form-field">
+        <span>Recurring? 🔁</span>
+        <select
+          value={recurrence}
+          onChange={(e) => setRecurrence(e.target.value)}
+        >
+          <option value="">No — one-time frog</option>
+          <option value="daily">Daily — returns each morning</option>
+          <option value="weekly">Weekly — returns every Friday</option>
+          <option value="monthly">Monthly — returns on the 1st</option>
+        </select>
+      </label>
 
       <button
         type="submit"

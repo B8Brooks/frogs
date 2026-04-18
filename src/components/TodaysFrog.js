@@ -38,6 +38,11 @@ export default function TodaysFrog({ frog, onEat }) {
       )}
       <div className="todays-frog-meta">
         <FrogSize size={frog.size} />
+        {frog.recurrence && (
+          <span className="recurrence-tag recurrence-tag-light">
+            🔁 {frog.recurrence}
+          </span>
+        )}
         {frog.bucket && (
           <span
             className="bucket-tag"

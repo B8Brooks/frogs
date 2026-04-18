@@ -37,12 +37,14 @@ export async function GET(request) {
   return NextResponse.json({ frogs });
 }
 
+const VALID_RECURRENCE = new Set(["daily", "weekly", "monthly"]);
+
 export async function POST(request) {
   const { error } = await requireSession();
   if (error) return error;
 
   const body = await request.json();
-  const { title, description, size, bucketId } = body;
+  const { title, description, size, bucketId, recurrence } = body;
 
   if (!title || typeof title !== "string" || !title.trim()) {
     return NextResponse.json({ error: "Title is required" }, { status: 400 });
@@ -54,6 +56,7 @@ export async function POST(request) {
       description: description?.trim() || null,
       size: clampSize(size),
       bucketId: bucketId || null,
+      recurrence: VALID_RECURRENCE.has(recurrence) ? recurrence : null,
     },
     include: { bucket: true },
   });

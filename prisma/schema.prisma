@@ -23,6 +23,7 @@ model Frog {
   isTodaysFrog Boolean   @default(false)
   completed    Boolean   @default(false)
   completedAt  DateTime?
+  recurrence   String?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
@@ -32,4 +33,5 @@ model Frog {
   @@index([isTodaysFrog])
   @@index([completed])
   @@index([bucketId])
+  @@index([recurrence])
 }

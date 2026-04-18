@@ -10,14 +10,21 @@ export default function FrogCard({ frog, onSetToday, onEat, onUneat, onDelete })
       <div className="frog-card-main">
         <div className="frog-card-header">
           <h3 className="frog-card-title">{frog.title}</h3>
-          {frog.bucket && (
-            <span
-              className="bucket-tag"
-              style={{ backgroundColor: frog.bucket.color }}
-            >
-              {frog.bucket.name}
-            </span>
-          )}
+          <div className="frog-card-tags">
+            {frog.recurrence && (
+              <span className="recurrence-tag" title={`Recurs ${frog.recurrence}`}>
+                🔁 {frog.recurrence}
+              </span>
+            )}
+            {frog.bucket && (
+              <span
+                className="bucket-tag"
+                style={{ backgroundColor: frog.bucket.color }}
+              >
+                {frog.bucket.name}
+              </span>
+            )}
+          </div>
         </div>
         {frog.description && (
           <p className="frog-card-desc">{frog.description}</p>

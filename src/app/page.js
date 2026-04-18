@@ -22,6 +22,7 @@ export default function Dashboard() {
   const [selectedBucketId, setSelectedBucketId] = useState("all");
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
 
   const showToast = useCallback((message) => {
     setToast(message);
@@ -117,6 +118,27 @@ export default function Dashboard() {
     showToast("Back in the pond it goes!");
   }
 
+  async function handleRefreshRecurring() {
+    if (refreshing) return;
+    setRefreshing(true);
+    try {
+      const res = await fetch("/api/frogs/refresh-recurring", { method: "POST" });
+      if (res.ok) {
+        const data = await res.json();
+        setFrogs(data.frogs);
+        if (data.refreshedCount > 0) {
+          showToast(
+            `${data.refreshedCount} frog${data.refreshedCount === 1 ? "" : "s"} hopped back into the pond! 🐸`,
+          );
+        } else {
+          showToast("No recurring frogs to refresh right now.");
+        }
+      }
+    } finally {
+      setRefreshing(false);
+    }
+  }
+
   async function handleDelete(frog) {
     if (!confirm(`Remove "${frog.title}" from the pond?`)) return;
     const res = await fetch(`/api/frogs/${frog.id}`, { method: "DELETE" });
@@ -151,6 +173,18 @@ export default function Dashboard() {
             selectedBucketId={selectedBucketId}
             onSelect={setSelectedBucketId}
           />
+        )}
+
+        {frogs.some((f) => f.recurrence) && (
+          <div className="refresh-row">
+            <button
+              className="btn btn-ghost"
+              onClick={handleRefreshRecurring}
+              disabled={refreshing}
+            >
+              {refreshing ? "Refreshing..." : "🔁 Refresh recurring frogs"}
+            </button>
+          </div>
         )}
 
         {loading ? (

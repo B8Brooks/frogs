@@ -632,6 +632,42 @@ select {
   white-space: nowrap;
 }
 
+.frog-card-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.recurrence-tag {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--pond);
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  text-transform: capitalize;
+}
+
+.recurrence-tag-light {
+  color: white;
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+.refresh-row {
+  display: flex;
+  justify-content: center;
+}
+
+.refresh-row .btn {
+  font-size: 0.9rem;
+}
+
 /* ---------- Toast ---------- */
 
 .toast {

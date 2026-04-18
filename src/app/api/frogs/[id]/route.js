@@ -24,6 +24,11 @@ export async function PATCH(request, { params }) {
   if ("description" in body) data.description = body.description?.trim() || null;
   if ("bucketId" in body) data.bucketId = body.bucketId || null;
 
+  if ("recurrence" in body) {
+    const valid = new Set(["daily", "weekly", "monthly"]);
+    data.recurrence = valid.has(body.recurrence) ? body.recurrence : null;
+  }
+
   if (typeof body.size !== "undefined") {
     const n = Number(body.size);
     if (Number.isFinite(n)) data.size = Math.min(5, Math.max(1, Math.round(n)));
