@@ -204,6 +204,38 @@ export default function Dashboard() {
     }
   }
 
+  async function handleReorder(orderedIds) {
+    try {
+      const res = await fetch("/api/frogs/reorder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderedIds }),
+      });
+      if (!res.ok) {
+        const msg = await parseError(res);
+        showToast(`Couldn't reorder: ${msg}`, "error");
+        return;
+      }
+      setFrogs((prev) => {
+        const map = new Map(prev.map((f) => [f.id, f]));
+        const reordered = orderedIds
+          .map((id, i) => {
+            const f = map.get(id);
+            return f ? { ...f, position: i } : null;
+          })
+          .filter(Boolean);
+        const rest = prev.filter((f) => !orderedIds.includes(f.id));
+        return [...reordered, ...rest];
+      });
+    } catch {
+      showToast("Network error — check your connection and try again.", "error");
+    }
+  }
+
+  function handleExport() {
+    window.open("/api/frogs/export", "_blank");
+  }
+
   const todaysFrog = frogs.find((f) => f.isTodaysFrog && !f.completed) || null;
 
   const filteredFrogs =
@@ -232,27 +264,35 @@ export default function Dashboard() {
           />
         )}
 
-        {frogs.some((f) => f.recurrence) && (
-          <div className="refresh-row">
+        <div className="action-row">
+          {frogs.some((f) => f.recurrence) && (
             <button
               className="btn btn-ghost"
               onClick={handleRefreshRecurring}
               disabled={refreshing}
             >
-              {refreshing ? "Refreshing..." : "🔁 Refresh recurring frogs"}
+              {refreshing ? "Refreshing..." : "🔁 Refresh recurring"}
             </button>
-          </div>
-        )}
+          )}
+          {frogs.length > 0 && (
+            <button className="btn btn-ghost" onClick={handleExport}>
+              📥 Export CSV
+            </button>
+          )}
+        </div>
 
         {loading ? (
           <p className="main-loading">Loading your pond...</p>
         ) : (
           <FrogList
             frogs={filteredFrogs}
+            buckets={buckets}
             onSetToday={handleSetToday}
             onEat={handleEat}
             onUneat={handleUneat}
             onDelete={handleDelete}
+            onPatch={patchFrog}
+            onReorder={handleReorder}
           />
         )}
       </main>

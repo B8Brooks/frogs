@@ -34,10 +34,22 @@ export async function PATCH(request, { params }) {
     if (Number.isFinite(n)) data.size = Math.min(5, Math.max(1, Math.round(n)));
   }
 
+  if (typeof body.postponed === "boolean") {
+    data.postponed = body.postponed;
+    if (body.postponed) data.isTodaysFrog = false;
+  }
+
+  if (typeof body.position === "number") {
+    data.position = body.position;
+  }
+
   if (typeof body.completed === "boolean") {
     data.completed = body.completed;
     data.completedAt = body.completed ? new Date() : null;
-    if (body.completed) data.isTodaysFrog = false;
+    if (body.completed) {
+      data.isTodaysFrog = false;
+      data.postponed = false;
+    }
   }
 
   if (typeof body.isTodaysFrog === "boolean") {

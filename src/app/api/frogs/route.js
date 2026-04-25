@@ -29,6 +29,8 @@ export async function GET(request) {
     orderBy: [
       { isTodaysFrog: "desc" },
       { completed: "asc" },
+      { postponed: "asc" },
+      { position: { sort: "asc", nulls: "last" } },
       { size: "desc" },
       { createdAt: "desc" },
     ],
