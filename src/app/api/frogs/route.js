@@ -30,6 +30,7 @@ export async function GET(request) {
       { isTodaysFrog: "desc" },
       { completed: "asc" },
       { postponed: "asc" },
+      { bucket: { name: "asc" } },
       { position: { sort: "asc", nulls: "last" } },
       { size: "desc" },
       { createdAt: "desc" },
