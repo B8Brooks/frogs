@@ -482,21 +482,22 @@ select {
 .frog-list {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
 .frog-list-section {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 4px;
 }
 
 .frog-list-heading {
-  font-size: 1rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: var(--pond);
-  letter-spacing: 0.03em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
+  margin-bottom: 2px;
 }
 
 .frog-list-count {
@@ -506,18 +507,19 @@ select {
 
 .frog-list-empty {
   margin: 0;
-  padding: 18px;
+  padding: 14px;
   background: var(--surface);
   border: 1px dashed var(--border);
   border-radius: var(--radius);
   color: var(--ink-muted);
   text-align: center;
+  font-size: 0.9rem;
 }
 
 .frog-list-items {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 3px;
 }
 
 .frog-list-toggle {
@@ -525,7 +527,7 @@ select {
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 12px 16px;
+  padding: 8px 12px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -533,7 +535,7 @@ select {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  font-size: 1rem;
+  font-size: 0.85rem;
 }
 
 .frog-list-toggle:hover {
@@ -541,24 +543,24 @@ select {
 }
 
 .frog-list-toggle-icon {
-  font-size: 1.1rem;
+  font-size: 1rem;
 }
 
 /* ---------- Frog card ---------- */
 
 .frog-card {
   background: var(--surface);
-  border-radius: var(--radius);
-  padding: 16px;
-  box-shadow: var(--shadow);
+  border-radius: 8px;
+  padding: 10px 12px;
+  box-shadow: 0 1px 3px rgba(31, 46, 38, 0.06);
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  align-items: center;
+  gap: 10px;
   border: 1px solid transparent;
 }
 
 .frog-card-eaten {
-  opacity: 0.72;
+  opacity: 0.6;
 }
 
 .frog-card-eaten .frog-card-title {
@@ -568,20 +570,25 @@ select {
 
 .frog-card-main {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 8px;
+  flex: 1;
+  min-width: 0;
+  flex-wrap: wrap;
 }
 
 .frog-card-header {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 10px;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
   flex-wrap: wrap;
 }
 
 .frog-card-title {
-  font-size: 1.05rem;
+  font-size: 0.95rem;
+  font-weight: 600;
   line-height: 1.3;
   margin: 0;
   word-break: break-word;
@@ -590,60 +597,65 @@ select {
 .frog-card-desc {
   margin: 0;
   color: var(--ink-muted);
-  font-size: 0.95rem;
+  font-size: 0.82rem;
+  line-height: 1.3;
+  flex-basis: 100%;
 }
 
 .frog-card-eaten-at {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   color: var(--ink-muted);
 }
 
 .frog-card-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 4px;
+  flex-shrink: 0;
 }
 
 .frog-card-actions .btn {
-  min-height: 40px;
-  padding: 8px 14px;
-  font-size: 0.9rem;
+  min-height: 32px;
+  padding: 4px 10px;
+  font-size: 0.8rem;
   flex-grow: 0;
 }
 
 /* ---------- Frog size + bucket tag ---------- */
 
 .frog-size {
-  font-size: 1rem;
+  font-size: 0.85rem;
   line-height: 1;
   display: inline-flex;
   align-items: center;
   letter-spacing: -2px;
+  flex-shrink: 0;
 }
 
 .bucket-tag {
   display: inline-block;
-  padding: 4px 10px;
+  padding: 2px 8px;
   border-radius: 999px;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 600;
   color: white;
   letter-spacing: 0.02em;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .frog-card-tags {
   display: flex;
-  gap: 6px;
+  gap: 4px;
   flex-wrap: wrap;
   align-items: center;
 }
 
 .recurrence-tag {
   display: inline-block;
-  padding: 4px 10px;
+  padding: 2px 8px;
   border-radius: 999px;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 600;
   color: var(--pond);
   background: var(--surface-muted);
@@ -683,12 +695,14 @@ select {
 }
 
 .frog-card-postponed {
-  opacity: 0.65;
+  opacity: 0.55;
   border-left: 3px solid var(--border);
 }
 
 .frog-card-editing {
   border: 2px solid var(--moss);
+  align-items: stretch;
+  flex-direction: column;
 }
 
 .frog-card-edit-form {
@@ -796,18 +810,5 @@ textarea.frog-edit-input {
 @media (min-width: 640px) {
   .todays-frog-title {
     font-size: 2rem;
-  }
-
-  .frog-card {
-    flex-direction: row;
-    align-items: center;
-  }
-
-  .frog-card-main {
-    flex: 1;
-  }
-
-  .frog-card-actions {
-    flex-shrink: 0;
   }
 }
