@@ -73,7 +73,7 @@ export default function FrogForm({ buckets, onCreate, onCreateBucket, onBucketsC
       } finally {
         setEstimating(false);
       }
-    }, 700);
+    }, 3000);
 
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
