@@ -13,6 +13,7 @@ Based on the "eat the frog" productivity method: if the first thing you do each 
 - ✅ **Eaten log** — keep a record of frogs you've crushed
 - 📱 **Works on your phone** — responsive web app, bookmark it on your home screen
 - 🔒 **Personal use** — simple password login, just for you
+- 🎵 **Music Basics** — interactive page for learning beat, tempo, rhythm, melody, and harmony from scratch, with a song-layers mixer, a tap-the-beat game, and an ear-training quiz (all sound is synthesized live in the browser — no audio files)
 
 ## Tech Stack
 
@@ -49,6 +50,11 @@ Generate a bcrypt hash for your password:
 ```bash
 node -e "console.log(require('bcryptjs').hashSync('your-password-here', 10))"
 ```
+
+> **Note:** when pasting the hash into `.env.local`, escape every `$` as `\$`
+> (e.g. `ADMIN_PASSWORD_HASH=\$2b\$10\$abc...`). Next.js expands `$VAR`
+> references in env files, which silently corrupts an unescaped bcrypt hash
+> and makes login fail. Env vars set in the Vercel dashboard don't need this.
 
 Get an Anthropic API key at https://console.anthropic.com/
 
@@ -88,19 +94,21 @@ Open http://localhost:3000 — you'll be redirected to the login page.
 ```
 frogs/
 ├── prisma/schema.prisma      # Database models: Bucket and Frog
-├── middleware.js              # Route protection
 └── src/
+    ├── middleware.js          # Route protection (must live in src/)
     ├── app/
     │   ├── page.js            # Main dashboard
+    │   ├── music/             # Music Basics learning page
     │   ├── login/             # Login page
     │   ├── api/
     │   │   ├── auth/          # NextAuth handler
     │   │   ├── frogs/         # Frog CRUD + AI estimate
     │   │   └── buckets/       # Bucket CRUD
     │   └── globals.css
-    ├── components/            # React components
+    ├── components/            # React components (music/ = music page)
     └── lib/
         ├── prisma.js          # DB client
         ├── auth.js            # Auth config
-        └── ai.js              # Claude API integration
+        ├── ai.js              # Claude API integration
+        └── music/             # Web Audio synth engine + song data
 ```

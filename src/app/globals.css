@@ -831,3 +831,568 @@ textarea.frog-edit-input {
     font-size: 2rem;
   }
 }
+
+/* ---------- Navbar links ---------- */
+
+.navbar-links {
+  display: flex;
+  gap: 6px;
+  flex: 1;
+  justify-content: center;
+}
+
+.navbar-link {
+  padding: 6px 12px;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.navbar-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.navbar-link.active {
+  background: rgba(255, 255, 255, 0.18);
+  color: white;
+}
+
+@media (max-width: 520px) {
+  .navbar-title span:last-child {
+    display: none;
+  }
+  .navbar-inner .btn-ghost {
+    padding: 6px 12px;
+    min-height: 36px;
+    font-size: 0.85rem;
+  }
+}
+
+/* ---------- Music page ---------- */
+
+.music-intro h1 {
+  font-size: 1.7rem;
+  margin-bottom: 6px;
+}
+
+.music-intro p {
+  margin: 0;
+  color: var(--ink-muted);
+}
+
+.music-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.music-next-step {
+  margin: 0;
+  padding: 14px 16px;
+  background: var(--surface-muted);
+  border: 1px dashed var(--moss-light);
+  border-radius: var(--radius);
+  color: var(--ink-muted);
+}
+
+/* ---------- Concept cards ---------- */
+
+.concept-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.concept-card p {
+  margin: 0;
+  line-height: 1.55;
+}
+
+.concept-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.concept-card-emoji {
+  font-size: 2.2rem;
+  line-height: 1;
+}
+
+.concept-card-header h2 {
+  font-size: 1.25rem;
+}
+
+.concept-card-tagline {
+  margin: 2px 0 0 !important;
+  color: var(--ink-muted);
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+.demo-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.demo-hint {
+  color: var(--ink-muted);
+  font-size: 0.9rem;
+}
+
+.real-songs {
+  background: var(--surface-muted);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-size: 0.9rem;
+}
+
+.real-songs-label {
+  font-weight: 700;
+  color: var(--pond);
+}
+
+.real-songs ul {
+  margin: 8px 0 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--ink-muted);
+}
+
+/* ---------- Beat dots ---------- */
+
+.beat-dots {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  padding: 8px 0;
+}
+
+.beat-dot {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--surface-muted);
+  color: var(--ink-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  transition: transform 0.08s, background 0.08s, color 0.08s;
+}
+
+.beat-dot-one {
+  border-color: var(--lily);
+}
+
+.beat-dot-active {
+  background: var(--moss);
+  border-color: var(--moss-dark);
+  color: white;
+  transform: scale(1.18);
+}
+
+.beat-dot-one.beat-dot-active {
+  background: var(--lily);
+  border-color: #b88a15;
+  color: #3a2d0a;
+}
+
+.beat-dots-small .beat-dot {
+  width: 38px;
+  height: 38px;
+  font-size: 0.9rem;
+}
+
+.tempo-slider {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.9rem;
+  color: var(--ink-muted);
+  flex: 1;
+  min-width: 180px;
+}
+
+.tempo-slider input {
+  width: 100%;
+  accent-color: var(--moss);
+}
+
+.tempo-picker {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* ---------- Melody ---------- */
+
+.song-picker {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.note-bubbles {
+  display: flex;
+  gap: 4px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  min-height: 90px;
+  padding: 8px 4px;
+  background: var(--surface-muted);
+  border-radius: var(--radius);
+}
+
+.note-bubble {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  color: var(--ink-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-bottom: var(--note-h, 0px);
+  transition: background 0.08s, transform 0.08s;
+}
+
+.note-bubble-active {
+  background: var(--clay);
+  border-color: #a3522f;
+  color: white;
+  transform: scale(1.2);
+}
+
+/* ---------- Harmony demo tiles ---------- */
+
+.demo-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+@media (min-width: 560px) {
+  .demo-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.demo-tile {
+  text-align: left;
+  padding: 12px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: var(--tap-min);
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.demo-tile:hover {
+  background: var(--surface-muted);
+}
+
+.demo-tile-active {
+  border-color: var(--moss);
+  background: rgba(74, 124, 89, 0.08);
+}
+
+.demo-tile-label {
+  font-weight: 700;
+  color: var(--pond);
+}
+
+.demo-tile-desc {
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+}
+
+/* ---------- Song Builder ---------- */
+
+.builder-transport {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.builder-transport .btn-large {
+  width: auto;
+  flex: 1;
+  min-width: 180px;
+}
+
+.chord-strip {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 4px;
+}
+
+.chord-chip {
+  text-align: center;
+  padding: 8px 2px;
+  border-radius: 8px;
+  background: var(--surface-muted);
+  border: 1.5px solid var(--border);
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--ink-muted);
+  transition: background 0.1s, color 0.1s;
+}
+
+.chord-chip-active {
+  background: var(--lily);
+  border-color: #b88a15;
+  color: #3a2d0a;
+}
+
+.layer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.layer-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  text-align: left;
+  min-height: var(--tap-min);
+  transition: opacity 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.layer-row-on {
+  border-color: var(--moss);
+  background: rgba(74, 124, 89, 0.06);
+}
+
+.layer-row-off {
+  opacity: 0.55;
+}
+
+.layer-emoji {
+  font-size: 1.6rem;
+}
+
+.layer-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.layer-name {
+  font-weight: 700;
+  color: var(--pond);
+}
+
+.layer-role {
+  font-size: 0.82rem;
+  color: var(--ink-muted);
+}
+
+.layer-switch {
+  font-weight: 800;
+  font-size: 0.8rem;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--surface-muted);
+  color: var(--ink-muted);
+  border: 1px solid var(--border);
+}
+
+.layer-switch.on {
+  background: var(--moss);
+  color: white;
+  border-color: var(--moss-dark);
+}
+
+.exercise-list {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--ink-muted);
+  font-size: 0.92rem;
+}
+
+.builder-exercises {
+  background: var(--surface-muted);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ---------- Tap game ---------- */
+
+.tap-pad {
+  width: 100%;
+  min-height: 110px;
+  border-radius: var(--radius);
+  border: 3px solid var(--moss-dark);
+  background: var(--moss);
+  color: white;
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  transition: transform 0.05s, background 0.05s;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.tap-pad:active:not(:disabled) {
+  transform: scale(0.98);
+  background: var(--moss-dark);
+}
+
+.tap-pad:disabled {
+  background: var(--surface-muted);
+  border-color: var(--border);
+  color: var(--ink-muted);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: not-allowed;
+}
+
+.tap-feedback {
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.tap-feedback .tap-ms {
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+  font-weight: 500;
+}
+
+.tap-perfect {
+  color: var(--moss-dark);
+}
+
+.tap-good {
+  color: var(--lily);
+}
+
+.tap-off {
+  color: var(--clay);
+}
+
+.tap-stats {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  color: var(--ink-muted);
+  font-size: 0.92rem;
+}
+
+/* ---------- Quiz ---------- */
+
+.quiz-score {
+  align-self: flex-end;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  font-size: 0.9rem;
+  color: var(--ink-muted);
+}
+
+.quiz-start {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.quiz-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.quiz-prompt {
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.quiz-option {
+  min-height: var(--tap-min);
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  font-weight: 600;
+  text-align: left;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.quiz-option:hover:not(:disabled) {
+  background: var(--surface-muted);
+}
+
+.quiz-option-right {
+  border-color: var(--moss);
+  background: rgba(74, 124, 89, 0.12) !important;
+}
+
+.quiz-option-wrong {
+  border-color: var(--danger);
+  background: rgba(180, 76, 58, 0.1) !important;
+}
+
+.quiz-result {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.quiz-correct {
+  color: var(--moss-dark);
+  font-weight: 700;
+}
+
+.quiz-incorrect {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.quiz-explain {
+  color: var(--ink-muted);
+}
