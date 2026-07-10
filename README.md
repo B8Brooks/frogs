@@ -13,7 +13,6 @@ Based on the "eat the frog" productivity method: if the first thing you do each 
 - ✅ **Eaten log** — keep a record of frogs you've crushed
 - 📱 **Works on your phone** — responsive web app, bookmark it on your home screen
 - 🔒 **Personal use** — simple password login, just for you
-- 🎵 **Music Basics** — interactive page for learning beat, tempo, rhythm, melody, and harmony from scratch, with a song-layers mixer, a tap-the-beat game, and an ear-training quiz (all sound is synthesized live in the browser — no audio files)
 
 ## Tech Stack
 
@@ -98,17 +97,15 @@ frogs/
     ├── middleware.js          # Route protection (must live in src/)
     ├── app/
     │   ├── page.js            # Main dashboard
-    │   ├── music/             # Music Basics learning page
     │   ├── login/             # Login page
     │   ├── api/
     │   │   ├── auth/          # NextAuth handler
     │   │   ├── frogs/         # Frog CRUD + AI estimate
     │   │   └── buckets/       # Bucket CRUD
     │   └── globals.css
-    ├── components/            # React components (music/ = music page)
+    ├── components/            # React components
     └── lib/
         ├── prisma.js          # DB client
         ├── auth.js            # Auth config
-        ├── ai.js              # Claude API integration
-        └── music/             # Web Audio synth engine + song data
+        └── ai.js              # Claude API integration
 ```
